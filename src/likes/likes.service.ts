@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like } from './like.entity';  // Supondo que você tenha uma entidade Like
-import { CreateLikeDto } from './dto/like.dto';  // DTO para criação de likes
+import { Like } from './like.entity';
+import { CreateLikeDto } from './dto/like.dto';
 
 @Injectable()
 export class LikesService {
