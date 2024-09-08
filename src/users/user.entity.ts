@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Publication } from '../publications/publication.entity';
 import { Comment } from '../comments/comment.entity';
+import { Follower } from '../followers/follower.entity';
+import { Like } from '../likes/like.entity';
 
 @Entity()
 export class User {
@@ -13,8 +15,8 @@ export class User {
   @Column({ name: 'email', type: 'varchar', unique: true })
   email: string;
 
-  @Column({ name: 'password_hash', type: 'text' })
-  password_hash: string;
+  @Column({ name: 'password', type: 'text' })
+  password: string;
 
   @Column({ name: 'name', type: 'varchar', nullable: true })
   name: string;
@@ -28,23 +30,18 @@ export class User {
   @Column({ name: 'website', type: 'varchar', nullable: true })
   website: string;
 
-  @OneToMany(() => Publication, publication => publication.user, { onDelete: 'CASCADE' })
-    publications: Publication[];
+  @OneToMany(() => Publication, publication => publication.user)
+  publications: Publication[];
 
-  @ManyToMany(() => User, user => user.followers)
-  @JoinTable({
-    name: 'follower',
-    joinColumn: { name: 'followerId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'followeeId', referencedColumnName: 'id' }
-  })
-  following: User[];
+  @OneToMany(() => Follower, follower => follower.follower)
+  following: Follower[];
 
-  @ManyToMany(() => Publication, publication => publication.likers)
-  likedPublications: Publication[];
+  @OneToMany(() => Follower, follower => follower.followee)
+  followers: Follower[];
 
-  @OneToMany(() => Comment, comment => comment.user, { onDelete: 'CASCADE' })
+  @OneToMany(() => Like, like => like.user)
+  likes: Like[];
+
+  @OneToMany(() => Comment, comment => comment.user)
   comments: Comment[];
-
-  @ManyToMany(() => User, user => user.following)
-  followers: User[];
 }

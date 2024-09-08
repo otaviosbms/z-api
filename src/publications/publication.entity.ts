@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Comment } from '../comments/comment.entity';
-
+import { Like } from '../likes/like.entity';
 
 @Entity()
 export class Publication {
@@ -11,20 +11,12 @@ export class Publication {
   @Column({ name: 'content', type: 'text' })
   content: string;
 
-  @Column({ name: 'userId', type: 'int' })
-  userId: number;
-
   @ManyToOne(() => User, user => user.publications)
   user: User;
 
-  @OneToMany(() => Comment, comment => comment.publication, { onDelete: 'CASCADE' })
+  @OneToMany(() => Comment, comment => comment.publication)
   comments: Comment[];
 
-  @ManyToMany(() => User, user => user.likedPublications)
-  @JoinTable({
-    name: 'like',
-    joinColumn: { name: 'publicationId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' }
-  })
-  likers: User[];
+  @OneToMany(() => Like, like => like.publication)
+  likes: Like[];
 }

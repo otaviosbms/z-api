@@ -65,7 +65,12 @@ export class CommentsService {
   // Listar todos os comentários de um post
   async getCommentsByPostId(postId: number) {
     try {
-      const comments = await this.commentsRepository.find({ where: { postId } });
+      const comments = await this.commentsRepository.find({
+      where: { 
+        publication: {id: postId}
+      },
+      relations: ['user', 'publication'],
+    });
       return comments;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -75,7 +80,12 @@ export class CommentsService {
   // Listar todos os comentários de um usuário
   async getCommentsByUserId(userId: number) {
     try {
-      const comments = await this.commentsRepository.find({ where: { userId } });
+      const comments = await this.commentsRepository.find({
+        where: {
+          user: { id: userId },
+        },
+        relations: ['user', 'publication']
+      });
       return comments;
     } catch (error) {
       throw new BadRequestException(error.message);

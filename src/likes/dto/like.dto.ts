@@ -5,5 +5,5 @@ export class CreateLikeDto {
   userId: number;
 
   @IsInt()
-  postId: number;
+  publicationId: number;
 }

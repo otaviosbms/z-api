@@ -3,24 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { Publication } from '../publications/publication.entity';
-import { Follower } from '../followers/follower.entity';
-import { Like } from '../likes/like.entity';
-import { Comment } from '../comments/comment.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Publication)
-    private publicationsRepository: Repository<Publication>,
-    @InjectRepository(Follower)
-    private followersRepository: Repository<Follower>,
-    @InjectRepository(Like)
-    private likesRepository: Repository<Like>,
-    @InjectRepository(Comment)
-    private commentsRepository: Repository<Comment>,
   ) {}
 
   // Criar um usuário
@@ -37,21 +25,21 @@ export class UsersService {
   // Obter um usuário por ID
   async getUserById(id: number) {
     try {
-      const user = await this.usersRepository.findOne({ where: { id } });
+      const user = await this.usersRepository.findOne({
+        where: { id },
+        relations: ['publications', 'following', 'followers', 'likes', 'comments'],
+      });
+
       if (!user) {
         throw new NotFoundException('User not found');
       }
-      const userPosts = await this.publicationsRepository.find({ where: { userId: id } });
-      const userFollowers = await this.followersRepository.find({ where: { followeeId: id } });
-      const userLikes = await this.likesRepository.find({ where: { userId: id } });
-      const userComments = await this.commentsRepository.find({ where: { userId: id } });
 
       return {
         user,
-        userPosts,
-        userFollowers,
-        userLikes,
-        userComments,
+        userPosts: user.publications,
+        userFollowers: user.followers,
+        userLikes: user.likes,
+        userComments: user.comments,
       };
     } catch (error) {
       throw new BadRequestException(error.message);

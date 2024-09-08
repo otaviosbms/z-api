@@ -1,23 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Publication } from '../publications/publication.entity';
 
-
 @Entity()
-@Unique(["userId", "publicationId"])
+@Unique(["user", "publication"])
 export class Like {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'userId', type: 'int' })
-  userId: number;
-
-  @Column({ name: 'publicationId', type: 'int' })
-  postId: number;
-
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, user => user.likes, { nullable: false })
   user: User;
 
-  @ManyToOne(() => Publication, { nullable: false })
+  @ManyToOne(() => Publication, publication => publication.likes, { nullable: false })
   publication: Publication;
 }

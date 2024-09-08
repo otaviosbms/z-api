@@ -62,15 +62,20 @@ export class PublicationsService {
     }
   }
 
-  // Obter posts de um usuário
-  async getPostsByUserId(userId: number) {
-    try {
-      const publications = await this.publicationsRepository.find({ where: { userId } });
-      return publications;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+// Obter posts de um usuário
+async getPostsByUserId(userId: number) {
+  try {
+    const publications = await this.publicationsRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['user', 'comments', 'likes'],
+    });
+    return publications;
+  } catch (error) {
+    throw new BadRequestException(error.message);
   }
+}
 
   // Obter todos os posts
   async getPosts() {

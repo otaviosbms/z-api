@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Publication } from '../publications/publication.entity';
 
-
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn()
@@ -10,12 +9,6 @@ export class Comment {
 
   @Column({ name: 'content', type: 'text' })
   content: string;
-
-  @Column({ name: 'userId', type: 'int' })
-  userId: number;
-
-  @Column({ name: 'postId', type: 'int' })
-  postId: number;
 
   @ManyToOne(() => User, user => user.comments, { onDelete: 'CASCADE' })
   user: User;
