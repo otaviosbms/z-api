@@ -7,7 +7,7 @@ import { CreatePublicationDto, UpdatePublicationDto } from './dto/publication.dt
 export class PublicationsController {
   constructor(private readonly publicationsService: PublicationsService) {}
 
-  // Rota para criar um post
+  // Rota para criar uma publicacao
   @Post()
   async createPost(@Body() createPublicationDto: CreatePublicationDto, @Res() res: Response) {
     try {
@@ -18,7 +18,7 @@ export class PublicationsController {
     }
   }
 
-  // Rota para obter um post pelo ID
+  // Rota para obter uma publicacao pelo ID
   @Get('/:id')
   async getPostById(@Param('id') id: number, @Res() res: Response) {
     try {
@@ -32,7 +32,7 @@ export class PublicationsController {
     }
   }
 
-  // Rota para atualizar um post pelo ID
+  // Rota para atualizar uma publicacao pelo ID
   @Patch('/:id')
   async updatePost(@Param('id') id: number, @Body() updatePublicationDto: UpdatePublicationDto, @Res() res: Response) {
     try {
@@ -46,7 +46,7 @@ export class PublicationsController {
     }
   }
 
-  // Rota para deletar um post pelo ID
+  // Rota para deletar uma publicacao pelo ID
   @Delete('/:id')
   async deletePost(@Param('id') id: number, @Res() res: Response) {
     try {
@@ -60,7 +60,7 @@ export class PublicationsController {
     }
   }
 
-  // Rota para listar todos os posts
+  // Rota para listar todas as publicacoes
   @Get()
   async getPosts(@Res() res: Response) {
     try {
@@ -71,7 +71,7 @@ export class PublicationsController {
     }
   }
 
-  // Rota para listar todos os posts de um usuário
+  // Rota para listar todas as publicacoes de um usuário
   @Get('/user/:userId')
   async getPostsByUserId(@Param('userId') userId: number, @Res() res: Response) {
     try {
