@@ -10,12 +10,7 @@ export class CreatePublicationDto {
 }
 
 export class UpdatePublicationDto {
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   content?: string;
-
-  @IsOptional()
-  @IsInt()
-  userId?: number;
 }
