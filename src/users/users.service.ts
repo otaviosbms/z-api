@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   // Criar um usuário
   async createUser(createUserDto: CreateUserDto) {
@@ -18,14 +18,14 @@ export class UsersService {
       await this.usersRepository.save(user);
       return user;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   // Obter um usuário por ID
   async getUserById(id: number) {
     try {
-      const user = await this.usersRepository.findOne({
+      const user: User = await this.usersRepository.findOne({
         where: { id },
         relations: ['publications', 'following', 'followers', 'likes', 'comments'],
       });
@@ -34,15 +34,9 @@ export class UsersService {
         throw new NotFoundException('User not found');
       }
 
-      return {
-        user,
-        userPosts: user.publications,
-        userFollowers: user.followers,
-        userLikes: user.likes,
-        userComments: user.comments,
-      };
+      return user;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -55,7 +49,7 @@ export class UsersService {
       }
       return this.usersRepository.findOne({ where: { id } });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -68,7 +62,7 @@ export class UsersService {
       }
       return 'User deleted successfully';
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -77,7 +71,7 @@ export class UsersService {
     try {
       return await this.usersRepository.find();
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

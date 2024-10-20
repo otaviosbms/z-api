@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follower } from './follower.entity';
@@ -14,29 +14,32 @@ export class FollowersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  // Criar um novo seguidor
-  async createFollower(followerData: CreateFollowerDto) {
-    try {
-      const { followerId, followeeId } = followerData;
+// Criar um novo seguidor
+async createFollower(followerData: CreateFollowerDto) {
+  try {
+    const { followerId, followeeId } = followerData;
 
-      const followerUser = await this.usersRepository.findOneBy({ id: followerId });
-      const followeeUser = await this.usersRepository.findOneBy({ id: followeeId });
+    const [followerUser, followeeUser] = await Promise.all([
+      this.usersRepository.findOneBy({ id: followerId }),
+      this.usersRepository.findOneBy({ id: followeeId }),
+    ]);
 
-      if (!followerUser || !followeeUser) {
-        throw new BadRequestException('User not found');
-      }
-
-      const follower = this.followersRepository.create({
-        follower: followerUser,
-        followee: followeeUser,
-      });
-
-      await this.followersRepository.save(follower);
-      return follower;
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    if (!followerUser || !followeeUser) {
+      throw new NotFoundException('User not found');
     }
+
+    const follower = this.followersRepository.create({
+      follower: followerUser,
+      followee: followeeUser,
+    });
+
+    await this.followersRepository.save(follower);
+    return follower;
+  } catch (error) {
+    throw new InternalServerErrorException(error.message);
   }
+}
+
 
   // Deletar um seguidor
   async deleteFollower(id: number) {
@@ -47,7 +50,7 @@ export class FollowersService {
       }
       return 'Follower deleted successfully';
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -62,7 +65,7 @@ async getFollowersByUserId(userId: number) {
     });
     return followers;
   } catch (error) {
-    throw new BadRequestException(error.message);
+    throw new InternalServerErrorException(error.message);
   }
 }
 }

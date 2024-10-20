@@ -23,7 +23,7 @@ import { Comment } from './comments/comment.entity';
       username: 'root',
       password: '',
       database: 'z',
-      entities: [Comment, Follower, Like, Publication, User, ],
+      entities: [Comment, Follower, Like, Publication, User],
       synchronize: true,
     }),
     UsersModule,
@@ -35,4 +35,4 @@ import { Comment } from './comments/comment.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

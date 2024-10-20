@@ -9,20 +9,11 @@ export class CreateCommentDto {
   userId: number;
 
   @IsInt()
-  postId: number;
+  publicationId: number;
 }
 
 export class UpdateCommentDto {
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   content?: string;
-
-  @IsOptional()
-  @IsInt()
-  userId?: number;
-
-  @IsOptional()
-  @IsInt()
-  postId?: number;
 }

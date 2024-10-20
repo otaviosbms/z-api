@@ -52,7 +52,7 @@ export class CommentsController {
   }
 
   // Rota para listar todos os comentários de um post
-  @Get('/post/:postId')
+  @Get('/publication/:postId')
   async getCommentsByPostId(@Param('postId') postId: number, @Res() res: Response) {
     try {
       const comments = await this.commentsService.getCommentsByPostId(postId);

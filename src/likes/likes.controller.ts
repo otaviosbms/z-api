@@ -5,7 +5,7 @@ import { CreateLikeDto } from './dto/like.dto';
 
 @Controller('likes')
 export class LikesController {
-  constructor(private readonly likesService: LikesService) {}
+  constructor(private readonly likesService: LikesService) { }
 
   // Rota para criar um novo like
   @Post()
@@ -33,8 +33,26 @@ export class LikesController {
     }
   }
 
+  // Rota para um usuário deletar um like de um post
+  @Delete(':userId/:publicationId')
+  async userDeleteLike(
+    @Param('userId') userId: number,
+    @Param('publicationId') publicationId: number,
+    @Res() res: Response) {
+    try {
+      const result = await this.likesService.userDeleteLike(userId, publicationId);
+      if (result === 'Like deleted successfully') {
+        return res.status(HttpStatus.OK).json({ message: result });
+      } else {
+        return res.status(HttpStatus.NOT_FOUND).json({ error: 'Like not found' });
+      }
+    } catch (err) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ error: err.message });
+    }
+  }
+
   // Rota para listar todos os likes de um post
-  @Get('/post/:postId')
+  @Get('/publication/:postId')
   async getLikesByPostId(@Param('postId') postId: number, @Res() res: Response) {
     try {
       const likes = await this.likesService.getLikesByPostId(postId);

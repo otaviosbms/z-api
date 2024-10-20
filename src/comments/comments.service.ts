@@ -1,37 +1,65 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { Comment } from './comment.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
+import { UsersService } from '../users/users.service';
+import { PublicationsService } from '../publications/publications.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentsRepository: Repository<Comment>,
-  ) {}
+    private readonly usersService: UsersService,
+    private readonly publicationsService: PublicationsService
+  ) { }
 
   // Criar um novo comentário
   async createComment(commentData: CreateCommentDto) {
     try {
-      const comment = this.commentsRepository.create(commentData);
+      const { userId, publicationId } = commentData;
+
+      const [user, publication] = await Promise.all([
+        this.usersService.getUserById(userId),
+        this.publicationsService.getPostById(publicationId),
+      ]);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      if (!publication) {
+        throw new NotFoundException('Publication not found');
+      }
+
+      const comment = this.commentsRepository.create({
+        ...commentData,
+        user,
+        publication,
+      });
+
       await this.commentsRepository.save(comment);
       return comment;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   // Obter um comentário por ID
   async getCommentById(id: number) {
     try {
-      const comment = await this.commentsRepository.findOne({ where: { id } });
+      const comment = await this.commentsRepository.findOne(
+        {
+          where: { id },
+          relations: ['user', 'publication']
+        }
+      );
       if (!comment) {
         throw new NotFoundException('Comment not found');
       }
       return comment;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -45,7 +73,7 @@ export class CommentsService {
       }
       return updatedComment;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -58,7 +86,7 @@ export class CommentsService {
       }
       return 'Comment deleted successfully';
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -66,14 +94,14 @@ export class CommentsService {
   async getCommentsByPostId(postId: number) {
     try {
       const comments = await this.commentsRepository.find({
-      where: { 
-        publication: {id: postId}
-      },
-      relations: ['user', 'publication'],
-    });
+        where: {
+          publication: { id: postId }
+        },
+        relations: ['user'],
+      });
       return comments;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -84,11 +112,11 @@ export class CommentsService {
         where: {
           user: { id: userId },
         },
-        relations: ['user', 'publication']
+        relations: ['publication']
       });
       return comments;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
